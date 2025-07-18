@@ -87,6 +87,8 @@ Edit
 User enters code.
 
 
+MULTIPLE DEVELOPERS can do coding in a single logic.😊
+
 AI reviews the code using the chosen LLM API (Gemini).
 
 Real-time collaboration is enabled via WebSockets.
@@ -104,10 +106,11 @@ CORS and input sanitization implemented.
 
 Socket communication is namespace scoped.
 
+---
 🤝 Contributions
 Pull requests are welcome! 🙌
 
 🙋 Developer
 Shivam Mishra
-🔗 LinkedIn
+LinkedIn: shivam134
 📧 sm6718858@gmail.com
