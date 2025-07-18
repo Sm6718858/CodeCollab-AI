@@ -18,12 +18,12 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 
 ## 🛠️ Tech Stack
 
-| Frontend        | Backend           | Others                  |
-|----------------|-------------------|--------------------------|
-| React.js        | Node.js           | OpenAI/Gemini API        |
-| TailwindCSS     | Express.js        | Socket.io                |
-| Prism.js        | Vite              | dotenv, axios            |
-| React Simple Code Editor |         |                          |
+| Frontend                | Backend     | Others               |
+|-------------------------|-------------|-----------------------|
+| React.js                | Node.js     | OpenAI/Gemini API     |
+| TailwindCSS             | Express.js  | Socket.io             |
+| Prism.js                | Vite        | dotenv, axios         |
+| React Simple Code Editor|             |                       |
 
 ---
 
@@ -31,9 +31,7 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 
 | Collaboration Panel | Code Review Panel |
 |---------------------|-------------------|
-| ![Collaborate](<img width="1340" height="838" alt="image" src="https://github.com/user-attachments/assets/ef279da1-14aa-490e-a52e-9a2d3a2bd679" />
-) | ![Review](<img width="1337" height="889" alt="image" src="https://github.com/user-attachments/assets/26a25f8d-545e-4218-a5bc-4fdb096e3ce4" />
-) |
+| ![Collaborate](https://github.com/user-attachments/assets/ef279da1-14aa-490e-a52e-9a2d3a2bd679) | ![Review](https://github.com/user-attachments/assets/26a25f8d-545e-4218-a5bc-4fdb096e3ce4) |
 
 ---
 
@@ -41,13 +39,14 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 
 ### 🔧 Prerequisites
 
-- Node.js ≥ 18
+- Node.js ≥ 18  
 - Gemini API Key
 
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/ai-collab-review.git](https://github.com/Sm6718858/CodeCollab-AI
+git clone https://github.com/Sm6718858/CodeCollab-AI.git
+cd CodeCollab-AI
 📁 Setup
 Install dependencies:
 
@@ -76,7 +75,7 @@ npm run dev
 cd ..
 npm run dev
 📂 Folder Structure
-pgsql
+bash
 Copy
 Edit
 ├── FrontEnd
@@ -96,7 +95,7 @@ Edit
 🧠 How It Works
 User enters code.
 
-Live Project -> https://code-collab-ai.vercel.app/
+Live Project 👉 code-collab-ai.vercel.app
 
 AI reviews the code using the chosen LLM API (Gemini).
 
@@ -106,7 +105,7 @@ Feedback is shown in a separate review panel.
 
 Developers can chat, modify, and improve code together.
 
-** IF user start prompt by '@' then IT will give response in FRIENDLY MANNER.
+If user starts prompt with @ → AI replies in a FRIENDLY MANNER.
 
 🛡️ Security
 API keys stored securely using .env.
@@ -115,9 +114,9 @@ CORS and input sanitization implemented.
 
 Socket communication is namespace scoped.
 
-
-
+🤝 Contributions
 Pull requests are welcome! 🙌
+
 📫 Contact
 Developer: Shivam Mishra
 LinkedIn: shivam134
