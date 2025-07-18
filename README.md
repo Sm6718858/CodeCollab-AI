@@ -35,7 +35,8 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 
 | Collaboration Panel | Code Review Panel |
 |---------------------|-------------------|
-| ![Collaborate](./screenshots/collaboration.png) | ![Review](./screenshots/review.png) |
+| ![Collaborate](<img width="1340" height="838" alt="image" src="https://github.com/user-attachments/assets/ef279da1-14aa-490e-a52e-9a2d3a2bd679" />
+) | ![Review](./screenshots/review.png) |
 
 ---
 
