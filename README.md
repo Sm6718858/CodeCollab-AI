@@ -5,7 +5,7 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 ---
 
 ## 🔥 Features
-
+Live Project 👉 [code-collab-ai.vercel.app](https://code-collab-ai.vercel.app/)
 - 🧠 **AI-Powered Code Review** – Get instant code suggestions using Gemini AI.
 - 👥 **Live Collaboration** – Real-time multi-user code editing.
 - 💬 **Review Panel** – View AI feedback and improvements.
@@ -86,7 +86,6 @@ Edit
 🧠 How It Works
 User enters code.
 
-Live Project 👉 code-collab-ai.vercel.app
 
 AI reviews the code using the chosen LLM API (Gemini).
 
