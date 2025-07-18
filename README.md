@@ -110,7 +110,8 @@ Socket communication is namespace scoped.
 🤝 Contributions
 Pull requests are welcome! 🙌
 
-🙋 Developer
+🙋 Developer- 
 Shivam Mishra
-LinkedIn: shivam134
+LinkedIn: https://www.linkedin.com/in/shivam134/
 📧 sm6718858@gmail.com
+```
