@@ -50,22 +50,13 @@ cd CodeCollab-AI
 📁 Setup
 Install dependencies:
 
-bash
-Copy
-Edit
 npm install
 Create a .env file and add your environment variables:
 
-ini
-Copy
-Edit
 VITE_API_BASE_URL=http://localhost:3000
 VITE_OPENAI_API_KEY=your_api_key
 Start frontend and backend:
 
-bash
-Copy
-Edit
 # Start backend
 cd server
 npm install
@@ -117,7 +108,7 @@ Socket communication is namespace scoped.
 🤝 Contributions
 Pull requests are welcome! 🙌
 
-📫 Contact
-Developer: Shivam Mishra
-LinkedIn: shivam134
-Email: sm6718858@gmail.com
+🙋 Developer
+Shivam Mishra
+🔗 LinkedIn
+📧 sm6718858@gmail.com
