@@ -106,7 +106,7 @@ CORS and input sanitization implemented.
 
 Socket communication is namespace scoped.
 
----
+```
 🤝 Contributions
 Pull requests are welcome! 🙌
 
