@@ -1,8 +1,4 @@
-# 🤖 AI-Based Collaborative Code Review Platform
-
-![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-Active-blue)
-![Contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)
+# 🤖 AI-Based Collaborative(one to one) Code Review Platform
 
 AI-Powered Code Review Platform for seamless collaborative programming. It allows real-time code editing, AI suggestions, code feedback, and developer-to-developer interaction in one place.
 
@@ -36,7 +32,8 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 | Collaboration Panel | Code Review Panel |
 |---------------------|-------------------|
 | ![Collaborate](<img width="1340" height="838" alt="image" src="https://github.com/user-attachments/assets/ef279da1-14aa-490e-a52e-9a2d3a2bd679" />
-) | ![Review](./screenshots/review.png) |
+) | ![Review](<img width="1337" height="889" alt="image" src="https://github.com/user-attachments/assets/26a25f8d-545e-4218-a5bc-4fdb096e3ce4" />
+) |
 
 ---
 
@@ -45,13 +42,12 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 ### 🔧 Prerequisites
 
 - Node.js ≥ 18
-- OpenAI / Gemini API Key
+- Gemini API Key
 
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/ai-collab-review.git
-cd ai-collab-review
+git clone https://github.com/your-username/ai-collab-review.git](https://github.com/Sm6718858/CodeCollab-AI
 📁 Setup
 Install dependencies:
 
@@ -64,7 +60,7 @@ Create a .env file and add your environment variables:
 ini
 Copy
 Edit
-VITE_API_BASE_URL=http://localhost:5000
+VITE_API_BASE_URL=http://localhost:3000
 VITE_OPENAI_API_KEY=your_api_key
 Start frontend and backend:
 
@@ -83,27 +79,34 @@ npm run dev
 pgsql
 Copy
 Edit
-├── client
+├── FrontEnd
 │   ├── components
 │   ├── hooks
+│   ├── utils
 │   ├── App.jsx
 │   ├── main.jsx
-├── server
+├── BackEnd
 │   ├── routes
 │   ├── controllers
-│   ├── index.js
+│   ├── services
+│   ├── sockets
+│   ├── server.js
 ├── .env
 ├── README.md
 🧠 How It Works
 User enters code.
 
-AI reviews the code using the chosen LLM API (OpenAI/Gemini).
+Live Project -> https://code-collab-ai.vercel.app/
+
+AI reviews the code using the chosen LLM API (Gemini).
 
 Real-time collaboration is enabled via WebSockets.
 
 Feedback is shown in a separate review panel.
 
 Developers can chat, modify, and improve code together.
+
+** IF user start prompt by '@' then IT will give response in FRIENDLY MANNER.
 
 🛡️ Security
 API keys stored securely using .env.
@@ -114,10 +117,8 @@ Socket communication is namespace scoped.
 
 
 
-
-
-
-
-
-
-Live -> https://code-collab-ai.vercel.app/
+Pull requests are welcome! 🙌
+📫 Contact
+Developer: Shivam Mishra
+LinkedIn: shivam134
+Email: sm6718858@gmail.com
