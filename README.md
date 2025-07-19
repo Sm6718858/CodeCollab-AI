@@ -89,7 +89,7 @@ User enters code.
 
 MULTIPLE DEVELOPERS can do coding in a single logic.😊
 
-AI reviews the code using the chosen LLM API (Gemini).
+AI reviews the code using the chosen API (Gemini).
 
 Real-time collaboration is enabled via WebSockets.
 
