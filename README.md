@@ -45,7 +45,6 @@ Live Project 👉 [code-collab-ai.vercel.app](https://code-collab-ai.vercel.app/
 ### 📦 Installation
 
 ```bash
-git clone https://github.com/Sm6718858/CodeCollab-AI.git
 cd CodeCollab-AI
 📁 Setup
 Install dependencies:
