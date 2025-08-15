@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require('uuid');
 const aiService = require('../services/ai.service');
 
 const rooms = new Map();
+const messageData = [];
 
 module.exports = (io, socket) => {
   // Create a new room
@@ -13,6 +14,7 @@ module.exports = (io, socket) => {
       name: userName || 'User 1',
       isOwner: true 
     });
+    
     
     rooms.set(roomId, {
       owner: socket.id,
@@ -29,6 +31,12 @@ module.exports = (io, socket) => {
     console.log(`🚪 Room created: ${roomId} by ${socket.id}`);
   });
 
+
+  socket.on("sendMessage", (data) => {
+    messageData.push(data);
+    io.emit("receiveMessage", data);
+  });
+  
   // Join an existing room
   socket.on('joinRoom', async ({ roomId, userName }) => {
     if (!rooms.has(roomId)) {

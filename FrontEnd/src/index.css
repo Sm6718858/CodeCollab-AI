@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+::-webkit-scrollbar {
+  display: none;
+}
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -71,3 +73,66 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+.code-editor-container{
+  display: flex;
+  height: 500px;
+  width: 100%;
+  position: relative;
+}
+.code-editor-container .code-editor {
+  height: 500px;
+  width: 100%;
+  overflow-y: scroll;
+  background: #000;
+}
+
+.chat {
+  border-radius: 8px;
+  width: 30vw;
+  margin-left: 10px;
+  height: 100%;
+  position: relative;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.chat h2 {
+  padding: 3px;
+  text-align: center;
+  font-size: 20px;
+  background: #010812;
+  position: sticky;
+  top: 0;
+}
+.chat-bottom {
+  position: sticky;
+  bottom: 0px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+.chat-container {
+  overflow-y: scroll;
+  background: #1e1d23;
+  flex: 1;
+  padding: 20px 10px;
+  height: 100%;
+  color: rgb(197, 195, 58);
+}
+.chat-container .userName{
+  color: rgb(191, 111, 77);
+}
+
+.chat-bottom input {
+  background: #010812;
+  border: 1px solid rgb(86, 83, 83);
+  border-radius: 8px;
+  width: 88%;
+  padding: 5px;
+  outline: none;
+}
+.chat-bottom .send {
+  height: 35px;
+  margin-inline: auto;
+}

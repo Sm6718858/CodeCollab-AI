@@ -1,31 +1,33 @@
-import { useState, useEffect, useRef } from 'react';
-import 'prismjs/themes/prism-tomorrow.css';
-import { io } from 'socket.io-client';
-import axios from 'axios';
+import { useState, useEffect, useRef } from "react";
+import "prismjs/themes/prism-tomorrow.css";
+import { io } from "socket.io-client";
+import axios from "axios";
 
-import useSocketListeners from './hooks/useSocketListeners';
-import CodeEditor from './components/CodeEditor';
-import ReviewPanel from './components/ReviewPanel';
-import CollaborationPanel from './components/CollaborationPanel';
-import ParticipantsList from './components/ParticipantsList';
-import SectionHeader from './components/SectionHeader';
-import { downloadReview } from './utils/downloadReview';
+import useSocketListeners from "./hooks/useSocketListeners";
+import CodeEditor from "./components/CodeEditor";
+import ReviewPanel from "./components/ReviewPanel";
+import CollaborationPanel from "./components/CollaborationPanel";
+import ParticipantsList from "./components/ParticipantsList";
+import SectionHeader from "./components/SectionHeader";
+import { downloadReview } from "./utils/downloadReview";
 
-
-import 'highlight.js/styles/github-dark.css';
+import "highlight.js/styles/github-dark.css";
+import Chat from "./components/Chat";
 
 function App() {
   const [code, setCode] = useState(`function sum() { return 1 + 1 }`);
-  const [review, setReview] = useState('');
+  const [review, setReview] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCollaborating, setIsCollaborating] = useState(false);
-  const [roomId, setRoomId] = useState('');
-  const [sessionName, setSessionName] = useState('');
-  const [userName, setUserName] = useState('');
+  const [roomId, setRoomId] = useState("");
+  const [sessionName, setSessionName] = useState("");
+  const [userName, setUserName] = useState("");
   const [participants, setParticipants] = useState([]);
-  const [roomName, setRoomName] = useState('');
-  const [error, setError] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [roomName, setRoomName] = useState("");
+  const [error, setError] = useState("");
   const [showCopySuccess, setShowCopySuccess] = useState(false);
+  // console.log(participants);
 
   const socketRef = useRef(null);
 
@@ -47,23 +49,26 @@ function App() {
   const handleCodeChange = (newCode) => {
     setCode(newCode);
     if (isCollaborating) {
-      socketRef.current.emit('codeChange', { roomId, code: newCode });
+      socketRef.current.emit("codeChange", { roomId, code: newCode });
     }
   };
 
   const reviewCode = async () => {
     setIsLoading(true);
-    setReview('');
-    setError('');
+    setReview("");
+    setError("");
     try {
       if (isCollaborating) {
-        socketRef.current.emit('requestReview', { roomId });
+        socketRef.current.emit("requestReview", { roomId });
       } else {
-        const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/ai/get-review`, { code });
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/ai/get-review`,
+          { code }
+        );
         setReview(res.data);
       }
     } catch (err) {
-      setReview(` Error: ${err.message || 'Could not generate content'}`);
+      setReview(` Error: ${err.message || "Could not generate content"}`);
     } finally {
       setIsLoading(false);
     }
@@ -76,14 +81,14 @@ function App() {
   };
 
   const createCollaborationSession = () => {
-    if (!sessionName.trim()) return setError('Please enter a session name');
-    if (!userName.trim()) return setError('Please enter your name');
-    setError('');
-    socketRef.current.emit('createRoom', {
+    if (!sessionName.trim()) return setError("Please enter a session name");
+    if (!userName.trim()) return setError("Please enter your name");
+    setError("");
+    socketRef.current.emit("createRoom", {
       name: sessionName,
       userName: userName.trim(),
     });
-    socketRef.current.once('roomCreated', ({ roomId, participants }) => {
+    socketRef.current.once("roomCreated", ({ roomId, participants }) => {
       setRoomId(roomId);
       setParticipants(participants);
       setRoomName(sessionName);
@@ -93,10 +98,10 @@ function App() {
   };
 
   const joinCollaborationSession = () => {
-    if (!roomId.trim()) return setError('Please enter a room ID');
-    if (!userName.trim()) return setError('Please enter your name');
-    setError('');
-    socketRef.current.emit('joinRoom', {
+    if (!roomId.trim()) return setError("Please enter a room ID");
+    if (!userName.trim()) return setError("Please enter your name");
+    setError("");
+    socketRef.current.emit("joinRoom", {
       roomId: roomId.trim(),
       userName: userName.trim(),
     });
@@ -104,11 +109,11 @@ function App() {
 
   const leaveCollaborationSession = () => {
     setIsCollaborating(false);
-    setRoomId('');
+    setRoomId("");
     setParticipants([]);
-    setRoomName('');
-    setError('You left the collaboration session');
-    setTimeout(() => setError(''), 3000);
+    setRoomName("");
+    setError("You left the collaboration session");
+    setTimeout(() => setError(""), 3000);
   };
 
   return (
@@ -138,8 +143,11 @@ function App() {
           />
         )}
 
-        <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden border border-gray-800">
+        <div className="code-editor-container bg-gray-900 rounded-xl shadow-md  border border-gray-800">
           <CodeEditor code={code} onChange={handleCodeChange} />
+          {isCollaborating && (
+            <Chat socketRef={socketRef} userName={userName} />
+          )}
         </div>
 
         {!isCollaborating && (
@@ -165,9 +173,9 @@ function App() {
           {isLoading ? (
             <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
           ) : isCollaborating ? (
-            'Request Collaborative Review'
+            "Request Collaborative Review"
           ) : (
-            'Review Code'
+            "Review Code"
           )}
         </button>
       </div>
