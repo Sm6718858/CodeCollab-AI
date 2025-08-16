@@ -14,6 +14,8 @@ import { downloadReview } from "./utils/downloadReview";
 import "highlight.js/styles/github-dark.css";
 import Chat from "./components/Chat";
 
+import useVoiceChat from "./hooks/useVoiceChat";
+
 function App() {
   const [code, setCode] = useState(`function sum() { return 1 + 1 }`);
   const [review, setReview] = useState("");
@@ -30,7 +32,22 @@ function App() {
   // console.log(participants);
 
   const socketRef = useRef(null);
+  const { localAudioRef, remoteAudioRef, startCall } = useVoiceChat(socketRef, roomId);
 
+
+  const [muted, setMuted] = useState(false); // NEW state for mute
+
+  const toggleMute = () => {
+    if (localAudioRef.current && localAudioRef.current.srcObject) {
+      const audioTracks = localAudioRef.current.srcObject.getAudioTracks();
+      if (audioTracks.length > 0) {
+        audioTracks[0].enabled = !audioTracks[0].enabled; // toggle audio
+        setMuted(!audioTracks[0].enabled);
+      }
+    }
+  };
+
+  
   useEffect(() => {
     socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
   }, []);
@@ -149,6 +166,30 @@ function App() {
             <Chat socketRef={socketRef} userName={userName} />
           )}
         </div>
+        <div>
+      {/* Your existing UI */}
+      {isCollaborating && (
+          <div className="flex gap-2 mt-4">
+            <button 
+              onClick={startCall} 
+              className="bg-green-600 px-4 py-2 rounded-md"
+            >
+              Start Voice Call
+            </button>
+
+            {/* Mute/Unmute Button */}
+            <button 
+              onClick={toggleMute} 
+              className={`px-4 py-2 rounded-md ${muted ? "bg-red-600" : "bg-yellow-600"}`}
+            >
+              {muted ? "Unmute" : "Mute"}
+            </button>
+
+            <audio ref={localAudioRef} autoPlay muted />
+            <audio ref={remoteAudioRef} autoPlay />
+          </div>
+        )}
+    </div>
 
         {!isCollaborating && (
           <div className="bg-gray-800 rounded-lg p-4 shadow-md border border-gray-700">

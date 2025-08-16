@@ -44,7 +44,7 @@ export default function ParticipantsList({
         <h4 className="text-md font-semibold text-gray-200">
           Participants ({participants.length})
         </h4>
-
+zz
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {participants.map((p) => (
             <div

@@ -39,6 +39,7 @@ module.exports = (io, socket) => {
   
   // Join an existing room
   socket.on('joinRoom', async ({ roomId, userName }) => {
+    console.log(`Join attempt - Room: ${roomId}, User: ${userName}, Socket: ${socket.id}`);
     if (!rooms.has(roomId)) {
       socket.emit('error', { message: 'Room not found' });
       return;
@@ -111,6 +112,44 @@ module.exports = (io, socket) => {
       });
     }
   });
+  // Handle chat messages
+socket.on('sendMessage', ({ roomId, message, userName }) => {
+  console.log('[SERVER] Received message for room:', roomId);
+  if (!rooms.has(roomId)) {
+    console.log('[SERVER] Room not found:', roomId);
+    return;
+  }
+
+  const room = rooms.get(roomId);
+  const sender = room.participants.get(socket.id);
+
+  const chatData = {
+    userName: userName || sender?.name || 'Anonymous',
+    message,
+    timestamp: new Date().toISOString(),
+    socketId: socket.id
+  };
+  console.log('[SERVER] Broadcasting to room:', roomId, 'Participants:', room.participants.size);
+
+  // Broadcast message to everyone in the room
+  io.to(roomId).emit('receiveMessage', chatData);
+
+  
+});
+
+// WebRTC signaling
+socket.on("offer", ({ roomId, sdp }) => {
+  socket.to(roomId).emit("offer", { sdp });
+});
+
+socket.on("answer", ({ roomId, sdp }) => {
+  socket.to(roomId).emit("answer", { sdp });
+});
+
+socket.on("iceCandidate", ({ roomId, candidate }) => {
+  socket.to(roomId).emit("iceCandidate", { candidate });
+});
+
 
   // Handle disconnection
   socket.on('disconnect', () => {
