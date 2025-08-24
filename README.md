@@ -107,7 +107,7 @@ Socket communication is namespace scoped.
 
 ```
 🤝 Contributions
-Pull requests are welcome! 🙌
+Pull requests are welcome! 🙌..
 
 🙋 Developer- 
 Shivam Mishra
