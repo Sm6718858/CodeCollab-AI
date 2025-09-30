@@ -8,6 +8,7 @@ AI-Powered Code Review Platform for seamless collaborative programming. It allow
 Live Project 👉 [code-collab-ai.vercel.app](https://code-collab-ai.vercel.app/)
 - 🧠 **AI-Powered Code Review** – Get instant code suggestions using Gemini AI.
 - 👥 **Live Collaboration** – Real-time multi-user code editing.
+- 👥 **Live Communication** – Real-time Chat and Voice Communication.
 - 💬 **Review Panel** – View AI feedback and improvements.
 - 🔒 **Secure Backend** – RESTful APIs with environment variable protection.
 - ⚡ **Socket.io Integration** – Real-time sync for code across sessions.
@@ -107,7 +108,7 @@ Socket communication is namespace scoped.
 
 ```
 🤝 Contributions
-Pull requests are welcome! 🙌
+Pull requests are welcome! 🙌..
 
 🙋 Developer- 
 Shivam Mishra
