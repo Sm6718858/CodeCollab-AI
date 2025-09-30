@@ -1,19 +1,19 @@
-export default function SectionHeader({ iconPath, title, subtitle }) {
+export default function SectionHeader({ icon, title, subtitle }) {
   return (
-    <div className="w-full px-4 py-3 sm:px-6 md:px-8">
-      <div className="flex items-center space-x-3">
-        <svg
-          className="w-6 h-6 text-accent"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path d={iconPath} stroke="currentColor" strokeWidth="2" />
-        </svg>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-white">
+    <div className="w-full pb-2 border-b border-gray-800">
+      <div className="flex items-center space-x-4">
+        <div className="p-2 rounded-full bg-gray-800 ring-2 ring-indigo-500/30 text-indigo-400">
+          {icon} 
+        </div>
+
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200 tracking-tight">
           {title}
         </h2>
       </div>
-      <p className="text-sm sm:text-base text-gray-400 mt-1">{subtitle}</p>
+      
+      <p className="text-sm sm:text-base text-gray-400 pl-14 mt-1">
+        {subtitle}
+      </p>
     </div>
   );
 }
