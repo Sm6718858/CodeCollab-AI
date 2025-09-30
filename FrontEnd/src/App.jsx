@@ -29,25 +29,34 @@ function App() {
   const [roomName, setRoomName] = useState("");
   const [error, setError] = useState("");
   const [showCopySuccess, setShowCopySuccess] = useState(false);
-  // console.log(participants);
 
   const socketRef = useRef(null);
   const { localAudioRef, remoteAudioRef, startCall } = useVoiceChat(socketRef, roomId);
-
-
-  const [muted, setMuted] = useState(false); // NEW state for mute
+  const [muted, setMuted] = useState(false);
+  const [isVoiceConnected, setIsVoiceConnected] = useState(false);
 
   const toggleMute = () => {
     if (localAudioRef.current && localAudioRef.current.srcObject) {
       const audioTracks = localAudioRef.current.srcObject.getAudioTracks();
       if (audioTracks.length > 0) {
-        audioTracks[0].enabled = !audioTracks[0].enabled; // toggle audio
+        audioTracks[0].enabled = !audioTracks[0].enabled;
         setMuted(!audioTracks[0].enabled);
       }
     }
   };
+  const stopVoice = () => {
+    if (localAudioRef.current && localAudioRef.current.srcObject) {
+      localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      localAudioRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
+      remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
+      remoteAudioRef.current.srcObject = null;
+    }
+    setIsVoiceConnected(false);
+  };
 
-  
+
   useEffect(() => {
     socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
   }, []);
@@ -167,29 +176,45 @@ function App() {
           )}
         </div>
         <div>
-      {/* Your existing UI */}
-      {isCollaborating && (
-          <div className="flex gap-2 mt-4">
-            <button 
-              onClick={startCall} 
-              className="bg-green-600 px-4 py-2 rounded-md"
-            >
-              Start Voice Call
-            </button>
+          {isCollaborating && (
+            <div className="flex flex-col gap-4 mt-4">
 
-            {/* Mute/Unmute Button */}
-            <button 
-              onClick={toggleMute} 
-              className={`px-4 py-2 rounded-md ${muted ? "bg-red-600" : "bg-yellow-600"}`}
-            >
-              {muted ? "Unmute" : "Mute"}
-            </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { startCall(); setIsVoiceConnected(true); }}
+                  className="bg-green-600 px-4 py-2 rounded-md"
+                >
+                  Start Voice Call
+                </button>
 
-            <audio ref={localAudioRef} autoPlay muted />
-            <audio ref={remoteAudioRef} autoPlay />
-          </div>
-        )}
-    </div>
+                <button
+                  onClick={toggleMute}
+                  className={`px-4 py-2 rounded-md ${muted ? "bg-red-600" : "bg-yellow-600"}`}
+                >
+                  {muted ? "Unmute" : "Mute"}
+                </button>
+
+                <button
+                  onClick={stopVoice}
+                  className="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-md"
+                >
+                  Stop Voice
+                </button>
+              </div>
+
+              {isVoiceConnected && (
+                <div className="flex justify-center items-center mt-3">
+                  <div className="w-4 h-4 bg-green-400 rounded-full animate-ping"></div>
+                  <div className="ml-2 text-green-400 font-semibold">Voice Connected...</div>
+                </div>
+              )}
+
+              <audio ref={localAudioRef} autoPlay muted />
+              <audio ref={remoteAudioRef} autoPlay />
+            </div>
+          )}
+
+        </div>
 
         {!isCollaborating && (
           <div className="bg-gray-800 rounded-lg p-4 shadow-md border border-gray-700">
