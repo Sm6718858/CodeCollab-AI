@@ -4,11 +4,10 @@ const detectLanguage = require("./detectLanguage");
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
 
-// ✅ Ensure you're using a valid model (check with listModels if needed)
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 const systemInstruction = `
-🎯 You are a **Senior Code Reviewer (7+ yrs exp)**. 
+🎯 You are a **Senior Code Reviewer (10+ yrs exp)**. 
 Your reviews must be:
 - Short, precise, and professional
 - Focused only on real issues (syntax, runtime, logic, major bugs)
@@ -25,7 +24,7 @@ Your reviews must be:
 <fixed or same code>
 \`\`\`
 
-📤 Output (simulated):
+📤 Output :
 <expected console/result or message>
 
 💡 Improvements:
@@ -39,12 +38,12 @@ const generateContent = async (code) => {
     if (code.trim().startsWith("@")) {
       const userMessage = code.trim().substring(1);
       const prompt = `
-🤖 You are an AI best friend — smart, witty, and supportive.
+🤖 You are an AI best friend — smart, witty, funny, and supportive.
 
 User: "${userMessage}"
 
 Reply in:
-- Friendly, casual tone
+- Friendly,impressive, casual tone
 - Use emojis, bold/italic, and short paras
 - Keep it engaging but useful
 `;
@@ -58,7 +57,7 @@ Reply in:
 
     // Case 2: Code Review
     const language = detectLanguage(code);
-    console.log("👉 Detected Language:", language);
+    // console.log("👉 Detected Language:", language);
 
     const prompt = `
 ${systemInstruction}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import "prismjs/themes/prism-tomorrow.css"; 
 import { io } from "socket.io-client";
 import axios from "axios";
-import { Mic, MicOff, PhoneCall, PhoneMissed, Wifi, Code, Zap, MessageSquare, X, Download } from 'lucide-react'; 
+import { Mic, MicOff, PhoneCall, PhoneMissed, Wifi, Code, Zap, MessageSquare, X, Download, Users, CornerDownLeft, Share2, Plus, LogIn } from 'lucide-react'; 
 
 import useSocketListeners from "./hooks/useSocketListeners";
 import CodeEditor from "./components/CodeEditor";
@@ -11,6 +11,7 @@ import CollaborationPanel from "./components/CollaborationPanel";
 import ParticipantsList from "./components/ParticipantsList";
 import SectionHeader from "./components/SectionHeader";
 import { downloadReview } from "./utils/downloadReview";
+import { Toaster } from "react-hot-toast";
 
 import "highlight.js/styles/github-dark.css"; 
 import Chat from "./components/Chat";
@@ -18,7 +19,6 @@ import Chat from "./components/Chat";
 import useVoiceChat from "./hooks/useVoiceChat";
 
 function App() {
-    // --- State Initialization (UNCHANGED) ---
     const [code, setCode] = useState(`function sum() { return 1 + 1 }`);
     const [review, setReview] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -143,66 +143,138 @@ function App() {
         setRoomName("");
         setError("You left the collaboration session");
         setTimeout(() => setError(""), 3000);
-        setShowChat(false); // Hide chat panel on leaving
+        setShowChat(false);
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-slate-100 font-sans relative overflow-x-hidden"> 
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 font-sans relative overflow-x-hidden">
+            <Toaster position="top-center" reverseOrder={false} /> 
             
-            <header className="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 p-4 shadow-xl">
-                <div className="max-w-8xl mx-auto flex justify-between items-center">
-                    <h1 className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-teal-400">
-                        CodeCollab - AI
-                    </h1>
+            {/* Enhanced Header */}
+            <header className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur-xl border-b border-slate-700/50 p-4 shadow-2xl shadow-slate-900/50">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                        <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                            <Code size={28} className="text-white" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                                CodeCollab AI
+                            </h1>
+                            <p className="text-xs text-slate-400">Real-time collaborative coding</p>
+                        </div>
+                    </div>
                     <nav className="flex items-center space-x-4">
                         {isCollaborating && (
-                            <span className="text-xs font-medium text-teal-400 flex items-center bg-gray-800 p-2 rounded-full px-3">
-                                <Wifi size={14} className="mr-1.5" />
-                                LIVE SESSION: {roomName}
-                            </span>
+                            <div className="flex items-center space-x-3 bg-slate-700/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-600/50">
+                                <div className="flex items-center space-x-2">
+                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span className="text-sm font-semibold text-green-400">LIVE</span>
+                                </div>
+                                <span className="text-sm font-medium text-slate-200">{roomName}</span>
+                                <Users size={16} className="text-slate-400" />
+                                <span className="text-sm text-slate-300">{participants.length}</span>
+                            </div>
                         )}
-                        {/* <button
-                            onClick={() => window.open('https://github.com/your-repo', '_blank')}
-                            className="text-sm font-medium text-slate-400 hover:text-indigo-400 transition-colors hidden sm:block"
-                        >
-                            Documentation
-                        </button> */}
                     </nav>
                 </div>
             </header>
 
-            <main className="max-w-8xl mx-auto p-4 md:p-8 lg:p-10 flex flex-col lg:flex-row gap-8">
-
+            <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+                {/* Global Error Banner */}
                 {error && (
-                    <div className="fixed top-16 left-1/2 -translate-x-1/2 z-[60] bg-red-700 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center justify-center font-medium transition-all duration-300 transform scale-100 hover:scale-[1.01]">
-                        <Zap size={20} className="mr-3" />
+                    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl flex items-center justify-center font-medium transition-all duration-300 transform scale-100 border border-red-400">
+                        <Zap size={18} className="mr-3 text-red-200" />
                         {error}
                     </div>
                 )}
 
-                <div className="w-full lg:w-3/5 xl:w-2/3 flex flex-col gap-6">
-
-                    <SectionHeader
-                        icon={<Code size={28} className="text-indigo-400" />}
-                        title="Collaborative Code Editor"
-                        subtitle="Write, paste your code, or ask AI a question (use @ prefix)"
-                    />
-
+                {/* Left Column: Code Editor & Collaboration */}
+                <div className="w-full lg:w-1/2 flex flex-col gap-6">
+                    {/* Collaboration Cards - Side by Side */}
                     {!isCollaborating && (
-                        <div className="bg-gray-800 rounded-xl p-6 shadow-2xl border border-gray-700 transition-all duration-300 hover:shadow-indigo-900/50">
-                            <CollaborationPanel
-                                userName={userName}
-                                setUserName={setUserName}
-                                sessionName={sessionName}
-                                setSessionName={setSessionName}
-                                roomId={roomId}
-                                setRoomId={setRoomId}
-                                createSession={createCollaborationSession}
-                                joinSession={joinCollaborationSession}
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Create New Room Card */}
+                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-6 shadow-2xl border border-slate-600/50 transition-all duration-300 hover:shadow-blue-500/20 hover:border-blue-500/30">
+                                <div className="flex items-center space-x-3 mb-4">
+                                    <div className="p-2 bg-blue-500/20 rounded-lg">
+                                        <Plus size={20} className="text-blue-400" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-200">Create New Room</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
+                                        <input
+                                            type="text"
+                                            value={userName}
+                                            onChange={(e) => setUserName(e.target.value)}
+                                            placeholder="Enter your name"
+                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-1">Session Name</label>
+                                        <input
+                                            type="text"
+                                            value={sessionName}
+                                            onChange={(e) => setSessionName(e.target.value)}
+                                            placeholder="Enter session name"
+                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={createCollaborationSession}
+                                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-blue-500/25 flex items-center justify-center space-x-2"
+                                    >
+                                        <Plus size={18} />
+                                        <span>Create Session</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Join Existing Room Card */}
+                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-6 shadow-2xl border border-slate-600/50 transition-all duration-300 hover:shadow-green-500/20 hover:border-green-500/30">
+                                <div className="flex items-center space-x-3 mb-4">
+                                    <div className="p-2 bg-green-500/20 rounded-lg">
+                                        <LogIn size={20} className="text-green-400" />
+                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-200">Join Existing Room</h3>
+                                </div>
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
+                                        <input
+                                            type="text"
+                                            value={userName}
+                                            onChange={(e) => setUserName(e.target.value)}
+                                            placeholder="Enter your name"
+                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-400 mb-1">Room ID</label>
+                                        <input
+                                            type="text"
+                                            value={roomId}
+                                            onChange={(e) => setRoomId(e.target.value)}
+                                            placeholder="Enter room ID"
+                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                        />
+                                    </div>
+                                    <button
+                                        onClick={joinCollaborationSession}
+                                        className="w-full bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-green-500/25 flex items-center justify-center space-x-2"
+                                    >
+                                        <LogIn size={18} />
+                                        <span>Join Session</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
 
+                    {/* Participants List */}
                     {isCollaborating && (
                         <ParticipantsList
                             roomName={roomName}
@@ -212,24 +284,40 @@ function App() {
                             showCopySuccess={showCopySuccess}
                             copyRoomId={copyRoomId}
                             leaveSession={leaveCollaborationSession}
-                            className="bg-gray-800 rounded-xl p-4 shadow-2xl border border-gray-700"
+                            className="bg-slate-800/80 rounded-2xl p-6 shadow-xl border border-slate-700/50"
                         />
                     )}
 
-                    <div className="code-editor-wrapper bg-[#0f0f1a] rounded-xl shadow-2xl border border-gray-700 overflow-hidden h-full min-h-[500px]">
-                        <CodeEditor code={code} onChange={handleCodeChange} />
+                    {/* Code Editor Section */}
+                    <div className="flex-1 flex flex-col gap-4">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-slate-200 flex items-center space-x-2">
+                                <Code size={24} className="text-blue-400" />
+                                <span>Code Editor</span>
+                            </h2>
+                            {isCollaborating && (
+                                <div className="flex items-center space-x-2 text-sm text-slate-400">
+                                    <Wifi size={16} className="text-green-400" />
+                                    <span>Real-time sync active</span>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="flex-1 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden min-h-[500px]">
+                            <CodeEditor code={code} onChange={handleCodeChange} />
+                        </div>
                     </div>
 
-                    <div className="flex flex-col gap-4">
-                        
+                    {/* Action Bar */}
+                    <div className="flex flex-col gap-4 sticky bottom-0 z-40 bg-slate-900/80 backdrop-blur-sm p-4 -mx-4 lg:mx-0 rounded-t-2xl border-t border-slate-700/50 lg:border-none">
+                        {/* Voice Chat Controls */}
                         {isCollaborating && (
-                            <div className="bg-gray-800 rounded-xl p-4 shadow-xl border border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-3">
+                            <div className="bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
                                 <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                                    
                                     <button
                                         onClick={() => { startCall(); setIsVoiceConnected(true); }}
                                         disabled={isVoiceConnected}
-                                        className="flex items-center justify-center flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-teal-600 hover:bg-teal-500 disabled:bg-gray-700 disabled:text-gray-400 text-white shadow-md hover:shadow-teal-500/40"
+                                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-teal-600 hover:bg-teal-500 disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md hover:shadow-teal-500/40 active:scale-95"
                                     >
                                         <PhoneCall size={18} className="mr-2" />
                                         Start Voice
@@ -238,7 +326,11 @@ function App() {
                                     <button
                                         onClick={toggleMute}
                                         disabled={!isVoiceConnected}
-                                        className={`flex items-center justify-center flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${muted ? "bg-red-600 hover:bg-red-500 shadow-red-500/40" : "bg-yellow-600 hover:bg-yellow-500 shadow-yellow-500/40"} disabled:bg-gray-700 disabled:text-gray-400 text-white shadow-md`}
+                                        className={`flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                                            muted 
+                                                ? "bg-red-600 hover:bg-red-500 shadow-red-500/40" 
+                                                : "bg-purple-600 hover:bg-purple-500 shadow-purple-500/40"
+                                        } disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md active:scale-95`}
                                     >
                                         {muted ? <MicOff size={18} className="mr-2" /> : <Mic size={18} className="mr-2" />}
                                         {muted ? "Unmute" : "Mute"}
@@ -247,7 +339,7 @@ function App() {
                                     <button
                                         onClick={stopVoice}
                                         disabled={!isVoiceConnected}
-                                        className="flex items-center justify-center flex-1 px-4 py-2 rounded-lg text-sm font-bold transition-all duration-200 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-gray-300 shadow-md"
+                                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-300 shadow-md active:scale-95"
                                     >
                                         <PhoneMissed size={18} className="mr-2" />
                                         Stop Voice
@@ -255,9 +347,9 @@ function App() {
                                 </div>
 
                                 {isVoiceConnected && (
-                                    <div className="flex items-center text-teal-400 font-semibold text-sm mt-2 sm:mt-0">
-                                        <Wifi size={18} className="mr-2 animate-pulse" />
-                                        Connected
+                                    <div className="flex items-center text-teal-400 font-semibold text-sm">
+                                        <Wifi size={18} className="mr-2 animate-pulse text-teal-300" />
+                                        Voice Connected
                                     </div>
                                 )}
 
@@ -266,79 +358,114 @@ function App() {
                             </div>
                         )}
 
+                        {/* AI Review Button */}
                         <button
                             onClick={reviewCode}
                             disabled={isLoading}
-                            className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-700 disabled:text-gray-400 transition-all duration-300 text-white px-6 py-4 rounded-xl font-extrabold text-xl shadow-2xl hover:shadow-indigo-500/60 active:scale-[0.99] flex items-center justify-center space-x-3"
+                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-400 transition-all duration-300 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-2xl hover:shadow-purple-500/40 active:scale-[0.98] flex items-center justify-center space-x-3 group"
                         >
                             {isLoading ? (
-                                <div className="w-5 h-5 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-                            ) : isCollaborating ? (
-                                <>
-                                    <Zap size={24} />
-                                    <span>Request Collaborative AI Review</span>
-                                </>
+                                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
                             ) : (
                                 <>
-                                    <Zap size={24} />
-                                    <span>Generate AI Review</span>
+                                    <Zap size={24} className="text-yellow-300 group-hover:scale-110 transition-transform" />
+                                    <span>
+                                        {isCollaborating ? "Request Collaborative AI Review" : "Generate AI Review"}
+                                    </span>
                                 </>
                             )}
                         </button>
                     </div>
-
                 </div>
 
-                <div className="w-full lg:w-2/5 xl:w-1/3 lg:sticky lg:top-[6rem] h-full lg:h-[calc(100vh-8rem)]"> 
-                    <ReviewPanel
-                        isLoading={isLoading}
-                        review={review}
-                        isCollaborating={isCollaborating}
-                        downloadReview={() => downloadReview(review)}
-                        className="h-full overflow-y-auto bg-gray-800 rounded-xl shadow-2xl border border-gray-700"
-                    />
+                {/* Right Column: Review Panel */}
+                <div className="w-full lg:w-1/2 lg:sticky lg:top-24 h-fit lg:h-[calc(100vh-8rem)] flex flex-col"> 
+                    <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-2xl border border-slate-700/50 h-full flex flex-col">
+                        {/* Review Panel Header */}
+                        <div className="p-6 border-b border-slate-700/50 flex-shrink-0">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center space-x-3">
+                                    <div className="p-2 bg-purple-500/20 rounded-lg">
+                                        <CornerDownLeft size={24} className="text-purple-400" />
+                                    </div>
+                                    <div>
+                                        <h2 className="text-xl font-bold text-slate-200">AI Code Review</h2>
+                                        <p className="text-sm text-slate-400">Detailed feedback and suggestions</p>
+                                    </div>
+                                </div>
+                                {review && (
+                                    <button
+                                        onClick={() => downloadReview(review)}
+                                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors duration-200 text-slate-300 hover:text-white"
+                                        title="Download Review"
+                                    >
+                                        <Download size={18} />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                        
+                        {/* Review Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <ReviewPanel
+                                isLoading={isLoading}
+                                review={review}
+                                isCollaborating={isCollaborating}
+                                downloadReview={() => downloadReview(review)}
+                            />
+                        </div>
+                    </div>
                 </div>
             </main>
 
+            {/* Enhanced Floating Chat Button */}
             {isCollaborating && (
                 <button
                     onClick={() => setShowChat(true)}
-                    className={`fixed bottom-8 right-8 z-50 p-4 bg-teal-600 rounded-2xl shadow-2xl transition-all duration-300 hover:bg-teal-500 hover:scale-[1.05] transform active:scale-95 text-white shadow-teal-500/50 ${
+                    className={`fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-teal-500 to-green-600 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 transform active:scale-95 text-white shadow-teal-500/50 hover:shadow-teal-500/70 ${
                         showChat ? 'opacity-0 pointer-events-none' : '' 
                     }`}
-                    aria-label="Toggle Chat"
+                    aria-label="Open Chat"
                 >
-                    <MessageSquare size={28} />
+                    <MessageSquare size={24} />
                 </button>
             )}
 
+            {/* Enhanced Chat Panel */}
             {isCollaborating && (
                 <div
-                    className={`fixed top-0 right-0 h-full w-full max-w-sm bg-gray-900 border-l border-teal-700 shadow-2xl z-[55] transition-transform duration-300 ease-in-out ${
+                    className={`fixed top-0 right-0 h-full w-full max-w-md bg-gradient-to-b from-slate-800 to-slate-900 border-l border-teal-500/30 shadow-2xl z-[55] transition-transform duration-300 ease-in-out ${
                         showChat ? 'translate-x-0' : 'translate-x-full'
-                    } sm:w-96`} 
+                    }`}
                 >
-                    {/* Use flex-col and h-full to manage vertical layout */}
                     <div className="flex flex-col h-full">
-                        
-                        <div className="flex justify-between items-center p-4 border-b border-gray-700 flex-shrink-0 bg-gray-950">
-                            <h3 className="text-xl font-bold text-teal-400">Collaborative Chat</h3>
+                        {/* Chat Header */}
+                        <div className="flex justify-between items-center p-6 border-b border-slate-700 flex-shrink-0 bg-slate-800/80 backdrop-blur-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="p-2 bg-teal-500/20 rounded-lg">
+                                    <MessageSquare size={20} className="text-teal-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-slate-200">Collaborative Chat</h3>
+                                    <p className="text-xs text-slate-400">Real-time messaging</p>
+                                </div>
+                            </div>
                             <button
                                 onClick={() => setShowChat(false)}
-                                className="p-1 rounded-full text-slate-400 hover:text-white hover:bg-gray-800 transition-colors"
+                                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
                                 aria-label="Close Chat"
                             >
-                                <X size={24} />
+                                <X size={20} />
                             </button>
                         </div>
                         
-                        <div className="flex-grow"> 
+                        {/* Chat Content */}
+                        <div className="flex-grow bg-slate-900/50"> 
                             <Chat socketRef={socketRef} userName={userName} />
                         </div>
                     </div>
                 </div>
             )}
-            
         </div>
     );
 }

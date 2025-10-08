@@ -19,7 +19,7 @@ export default function CollaborationPanel({
                     type="text"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    placeholder="Enter your name or alias"
+                    placeholder="Enter your name"
                     className="bg-gray-900 text-white px-4 py-3 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-inner transition-colors"
                 />
             </div>

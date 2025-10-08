@@ -1,4 +1,3 @@
-// controllers/ai.controller.js
 const aiService = require("../services/ai.service");
 
 module.exports.getReview = async (req, res) => {

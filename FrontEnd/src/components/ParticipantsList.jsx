@@ -13,7 +13,6 @@ export default function ParticipantsList({
 
   return (
     <div className="bg-gray-800 border border-gray-700 rounded-lg p-4 mb-4 space-y-4 shadow-md">
-      {/* Room Info Header */}
       <div className="space-y-2">
         <h3 className="text-lg font-bold text-white">{roomName}</h3>
 
@@ -39,7 +38,6 @@ export default function ParticipantsList({
         )}
       </div>
 
-      {/* Participants List */}
       <div className="space-y-2">
         <h4 className="text-md font-semibold text-gray-200">
           Participants ({participants.length})
@@ -62,7 +60,6 @@ zz
         </div>
       </div>
 
-      {/* Leave Button */}
       <button
         onClick={leaveSession}
         className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-md font-semibold transition"

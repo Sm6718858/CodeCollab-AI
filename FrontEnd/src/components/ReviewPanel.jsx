@@ -21,7 +21,7 @@ export default function ReviewPanel({ isLoading, review, isCollaborating, downlo
           <h2 className="text-lg font-semibold text-white">Code Review or Your FAQ Answer</h2>
           <button
             onClick={downloadReview}
-            className="text-xl disabled:opacity-40 hover:scale-105 transition-transform"
+            className="text-xl cursor-pointer disabled:opacity-40 hover:scale-105 transition-transform"
             disabled={!review}
           >
             📥

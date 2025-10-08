@@ -14,8 +14,6 @@ module.exports = (io, socket) => {
       name: userName || 'User 1',
       isOwner: true 
     });
-    
-    
     rooms.set(roomId, {
       owner: socket.id,
       code: '',
