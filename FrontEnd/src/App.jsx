@@ -147,11 +147,12 @@ function App() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 font-sans relative overflow-x-hidden">
+       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100 font-sans relative overflow-x-hidden">
+
             <Toaster position="top-center" reverseOrder={false} /> 
             
-            {/* Enhanced Header */}
-            <header className="sticky top-0 z-50 bg-slate-800/95 backdrop-blur-xl border-b border-slate-700/50 p-4 shadow-2xl shadow-slate-900/50">
+            <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-2xl border-b border-slate-700/40 p-4 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div className="flex items-center space-x-3">
                         <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
@@ -181,7 +182,6 @@ function App() {
             </header>
 
             <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
-                {/* Global Error Banner */}
                 {error && (
                     <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl flex items-center justify-center font-medium transition-all duration-300 transform scale-100 border border-red-400">
                         <Zap size={18} className="mr-3 text-red-200" />
@@ -189,13 +189,11 @@ function App() {
                     </div>
                 )}
 
-                {/* Left Column: Code Editor & Collaboration */}
                 <div className="w-full lg:w-1/2 flex flex-col gap-6">
-                    {/* Collaboration Cards - Side by Side */}
                     {!isCollaborating && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {/* Create New Room Card */}
-                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-6 shadow-2xl border border-slate-600/50 transition-all duration-300 hover:shadow-blue-500/20 hover:border-blue-500/30">
+                            <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+>
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="p-2 bg-blue-500/20 rounded-lg">
                                         <Plus size={20} className="text-blue-400" />
@@ -210,7 +208,10 @@ function App() {
                                             value={userName}
                                             onChange={(e) => setUserName(e.target.value)}
                                             placeholder="Enter your name"
-                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
+focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
+transition-all duration-300"
+
                                         />
                                     </div>
                                     <div>
@@ -220,7 +221,10 @@ function App() {
                                             value={sessionName}
                                             onChange={(e) => setSessionName(e.target.value)}
                                             placeholder="Enter session name"
-                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
+focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
+transition-all duration-300"
+
                                         />
                                     </div>
                                     <button
@@ -233,8 +237,8 @@ function App() {
                                 </div>
                             </div>
 
-                            {/* Join Existing Room Card */}
-                            <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl p-6 shadow-2xl border border-slate-600/50 transition-all duration-300 hover:shadow-green-500/20 hover:border-green-500/30">
+                            <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-700/40"
+>
                                 <div className="flex items-center space-x-3 mb-4">
                                     <div className="p-2 bg-green-500/20 rounded-lg">
                                         <LogIn size={20} className="text-green-400" />
@@ -249,7 +253,10 @@ function App() {
                                             value={userName}
                                             onChange={(e) => setUserName(e.target.value)}
                                             placeholder="Enter your name"
-                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
+focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
+transition-all duration-300"
+
                                         />
                                     </div>
                                     <div>
@@ -259,7 +266,10 @@ function App() {
                                             value={roomId}
                                             onChange={(e) => setRoomId(e.target.value)}
                                             placeholder="Enter room ID"
-                                            className="w-full bg-slate-700/50 border border-slate-600 rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
+focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
+transition-all duration-300"
+
                                         />
                                     </div>
                                     <button
@@ -274,7 +284,6 @@ function App() {
                         </div>
                     )}
 
-                    {/* Participants List */}
                     {isCollaborating && (
                         <ParticipantsList
                             roomName={roomName}
@@ -288,7 +297,6 @@ function App() {
                         />
                     )}
 
-                    {/* Code Editor Section */}
                     <div className="flex-1 flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold text-slate-200 flex items-center space-x-2">
@@ -303,14 +311,13 @@ function App() {
                             )}
                         </div>
                         
-                        <div className="flex-1 bg-slate-800 rounded-2xl shadow-2xl border border-slate-700/50 overflow-hidden min-h-[500px]">
+                        <div className="flex-1 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-700/40 shadow-[0_0_20px_rgba(0,0,0,0.5)] overflow-hidden min-h-[500px]"
+>
                             <CodeEditor code={code} onChange={handleCodeChange} />
                         </div>
                     </div>
 
-                    {/* Action Bar */}
                     <div className="flex flex-col gap-4 sticky bottom-0 z-40 bg-slate-900/80 backdrop-blur-sm p-4 -mx-4 lg:mx-0 rounded-t-2xl border-t border-slate-700/50 lg:border-none">
-                        {/* Voice Chat Controls */}
                         {isCollaborating && (
                             <div className="bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
                                 <div className="flex flex-wrap gap-3 w-full sm:w-auto">
@@ -358,11 +365,15 @@ function App() {
                             </div>
                         )}
 
-                        {/* AI Review Button */}
                         <button
                             onClick={reviewCode}
                             disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:from-slate-700 disabled:to-slate-700 disabled:text-slate-400 transition-all duration-300 text-white px-6 py-4 rounded-xl font-bold text-lg shadow-2xl hover:shadow-purple-500/40 active:scale-[0.98] flex items-center justify-center space-x-3 group"
+                            className="w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 
+hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] 
+disabled:opacity-40 transition-all duration-300 
+text-white px-6 py-4 rounded-2xl font-bold text-lg 
+active:scale-95 flex items-center justify-center space-x-3"
+
                         >
                             {isLoading ? (
                                 <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -378,7 +389,6 @@ function App() {
                     </div>
                 </div>
 
-                {/* Right Column: Review Panel */}
                 <div className="w-full lg:w-1/2 lg:sticky lg:top-24 h-fit lg:h-[calc(100vh-8rem)] flex flex-col"> 
                     <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-2xl border border-slate-700/50 h-full flex flex-col">
                         {/* Review Panel Header */}
@@ -405,7 +415,6 @@ function App() {
                             </div>
                         </div>
                         
-                        {/* Review Content */}
                         <div className="flex-1 overflow-y-auto p-6">
                             <ReviewPanel
                                 isLoading={isLoading}
@@ -418,7 +427,6 @@ function App() {
                 </div>
             </main>
 
-            {/* Enhanced Floating Chat Button */}
             {isCollaborating && (
                 <button
                     onClick={() => setShowChat(true)}
@@ -431,10 +439,13 @@ function App() {
                 </button>
             )}
 
-            {/* Enhanced Chat Panel */}
             {isCollaborating && (
                 <div
-                    className={`fixed top-0 right-0 h-full w-full max-w-md bg-gradient-to-b from-slate-800 to-slate-900 border-l border-teal-500/30 shadow-2xl z-[55] transition-transform duration-300 ease-in-out ${
+                    className={`fixed top-0 right-0 h-full w-full max-w-md 
+bg-slate-900/80 backdrop-blur-2xl 
+border-l border-teal-400/30 shadow-[0_0_30px_rgba(0,0,0,0.5)] 
+z-[55] transition-transform duration-500 ease-in-out
+ ${
                         showChat ? 'translate-x-0' : 'translate-x-full'
                     }`}
                 >
@@ -459,7 +470,6 @@ function App() {
                             </button>
                         </div>
                         
-                        {/* Chat Content */}
                         <div className="flex-grow bg-slate-900/50"> 
                             <Chat socketRef={socketRef} userName={userName} />
                         </div>

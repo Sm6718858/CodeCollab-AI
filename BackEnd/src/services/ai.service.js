@@ -3,18 +3,18 @@ require("dotenv").config();
 const detectLanguage = require("./detectLanguage");
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_GEMINI_KEY);
-
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 const systemInstruction = `
-🎯 You are a **Senior Code Reviewer (10+ yrs exp)**. 
-Your reviews must be:
-- Short, precise, and professional
-- Focused only on real issues (syntax, runtime, logic, major bugs)
-- Well-structured with clear sections
-- Engaging with subtle emojis for readability
+🎯 You are a Senior Code Reviewer (10+ yrs exp).
 
-📌 Format strictly:
+Your reviews must be:
+• Short, precise, professional  
+• Only real issues (syntax, runtime, logic, major bugs)  
+• Clear sections  
+• Light emoji use  
+
+📌 Format:
 
 ❌ Issues:
 • If none: "No issues found ✅"
@@ -24,28 +24,32 @@ Your reviews must be:
 <fixed or same code>
 \`\`\`
 
-📤 Output :
-<expected console/result or message>
+📤 Output:
+<what the code would print / return>
 
 💡 Improvements:
-• If any, list briefly (best practices / readability / performance).
-• If none: "No improvements required".
+• If any, keep brief (readability / best-practice / performance)
+• If none: "No improvements required"
 `;
 
 const generateContent = async (code) => {
   try {
-    // Case 1: AI Friend (@query)
-    if (code.trim().startsWith("@")) {
-      const userMessage = code.trim().substring(1);
+    const text = code.trim();
+
+    // ---------- CASE 1: AI Friend Mode ----------
+    if (text.startsWith("@")) {
+      const userMessage = text.slice(1).trim();
+
       const prompt = `
-🤖 You are an AI best friend — smart, witty, funny, and supportive.
+You are an AI best friend — smart, funny, supportive.
 
 User: "${userMessage}"
 
-Reply in:
-- Friendly,impressive, casual tone
-- Use emojis, bold/italic, and short paras
-- Keep it engaging but useful
+Respond in:
+• Friendly + impressive tone  
+• Short paras  
+• Useful but light  
+• Emojis allowed  
 `;
 
       const result = await model.generateContent({
@@ -55,17 +59,15 @@ Reply in:
       return result.response.text();
     }
 
-    // Case 2: Code Review
-    const language = detectLanguage(code);
-    // console.log("👉 Detected Language:", language);
-
+    // ---------- CASE 2: Code Review Mode ----------
+    const language = detectLanguage(text);
     const prompt = `
 ${systemInstruction}
 
-🛠 Code Language: ${language}
+🛠 Language: ${language}
 
 \`\`\`${language}
-${code}
+${text}
 \`\`\`
 `;
 
@@ -75,9 +77,9 @@ ${code}
 
     return result.response.text();
 
-  } catch (error) {
-    console.error("❌ Error generating content:", error.message);
-    return "⚠️ Sorry, I couldn't generate the review. Please try again later.";
+  } catch (err) {
+    console.error("❌ AI Error:", err.message);
+    return "⚠️ Unable to generate review. Try again.";
   }
 };
 
