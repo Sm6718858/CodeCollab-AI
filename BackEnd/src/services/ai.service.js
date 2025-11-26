@@ -36,7 +36,6 @@ const generateContent = async (code) => {
   try {
     const text = code.trim();
 
-    // ---------- CASE 1: AI Friend Mode ----------
     if (text.startsWith("@")) {
       const userMessage = text.slice(1).trim();
 
@@ -59,7 +58,6 @@ Respond in:
       return result.response.text();
     }
 
-    // ---------- CASE 2: Code Review Mode ----------
     const language = detectLanguage(text);
     const prompt = `
 ${systemInstruction}

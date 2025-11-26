@@ -1,483 +1,584 @@
 import { useState, useEffect, useRef } from "react";
-import "prismjs/themes/prism-tomorrow.css"; 
+import "prismjs/themes/prism-tomorrow.css";
 import { io } from "socket.io-client";
 import axios from "axios";
-import { Mic, MicOff, PhoneCall, PhoneMissed, Wifi, Code, Zap, MessageSquare, X, Download, Users, CornerDownLeft, Share2, Plus, LogIn } from 'lucide-react'; 
+import {
+  Mic,
+  MicOff,
+  PhoneCall,
+  PhoneMissed,
+  Wifi,
+  Code,
+  Zap,
+  MessageSquare,
+  X,
+  Download,
+  Users,
+  CornerDownLeft,
+  Plus,
+  LogIn,
+} from "lucide-react";
 
 import useSocketListeners from "./hooks/useSocketListeners";
 import CodeEditor from "./components/CodeEditor";
 import ReviewPanel from "./components/ReviewPanel";
-import CollaborationPanel from "./components/CollaborationPanel";
 import ParticipantsList from "./components/ParticipantsList";
-import SectionHeader from "./components/SectionHeader";
 import { downloadReview } from "./utils/downloadReview";
 import { Toaster } from "react-hot-toast";
 
-import "highlight.js/styles/github-dark.css"; 
+import "highlight.js/styles/github-dark.css";
 import Chat from "./components/Chat";
-
 import useVoiceChat from "./hooks/useVoiceChat";
 
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/clerk-react";
+
 function App() {
-    const [code, setCode] = useState(`function sum() { return 1 + 1 }`);
-    const [review, setReview] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
-    const [isCollaborating, setIsCollaborating] = useState(false);
-    const [roomId, setRoomId] = useState("");
-    const [sessionName, setSessionName] = useState("");
-    const [userName, setUserName] = useState("");
-    const [participants, setParticipants] = useState([]);
-    const [roomName, setRoomName] = useState("");
-    const [error, setError] = useState("");
-    const [showCopySuccess, setShowCopySuccess] = useState(false);
-    
-    const [showChat, setShowChat] = useState(false);
+  const [code, setCode] = useState(`function sum() { return 1 + 1 }`);
+  const [review, setReview] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCollaborating, setIsCollaborating] = useState(false);
+  const [roomId, setRoomId] = useState("");
+  const [sessionName, setSessionName] = useState("");
+  const [userName, setUserName] = useState("");
+  const [participants, setParticipants] = useState([]);
+  const [roomName, setRoomName] = useState("");
+  const [error, setError] = useState("");
+  const [showCopySuccess, setShowCopySuccess] = useState(false);
+  const [showChat, setShowChat] = useState(false);
 
-    const socketRef = useRef(null);
-    const { localAudioRef, remoteAudioRef, startCall } = useVoiceChat(socketRef, roomId);
-    const [muted, setMuted] = useState(false);
-    const [isVoiceConnected, setIsVoiceConnected] = useState(false);
+  const socketRef = useRef(null);
+  const { localAudioRef, remoteAudioRef, startCall } = useVoiceChat(
+    socketRef,
+    roomId
+  );
+  const [muted, setMuted] = useState(false);
+  const [isVoiceConnected, setIsVoiceConnected] = useState(false);
 
-    const toggleMute = () => {
-        if (localAudioRef.current && localAudioRef.current.srcObject) {
-            const audioTracks = localAudioRef.current.srcObject.getAudioTracks();
-            if (audioTracks.length > 0) {
-                audioTracks[0].enabled = !audioTracks[0].enabled;
-                setMuted(!audioTracks[0].enabled);
-            }
-        }
-    };
-    const stopVoice = () => {
-        if (localAudioRef.current && localAudioRef.current.srcObject) {
-            localAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
-            localAudioRef.current.srcObject = null;
-        }
-        if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
-            remoteAudioRef.current.srcObject.getTracks().forEach(track => track.stop());
-            remoteAudioRef.current.srcObject = null;
-        }
-        setIsVoiceConnected(false);
-    };
+  const { user, isSignedIn } = useUser();
 
-    useEffect(() => {
-        socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
-    }, []);
+  const toggleMute = () => {
+    if (localAudioRef.current && localAudioRef.current.srcObject) {
+      const audioTracks = localAudioRef.current.srcObject.getAudioTracks();
+      if (audioTracks.length > 0) {
+        audioTracks[0].enabled = !audioTracks[0].enabled;
+        setMuted(!audioTracks[0].enabled);
+      }
+    }
+  };
 
-    useSocketListeners({
-        socketRef,
-        setCode,
-        setReview,
-        setParticipants,
-        setRoomName,
-        setError,
-        setIsLoading,
-        setIsCollaborating,
-    });
+  const stopVoice = () => {
+    if (localAudioRef.current && localAudioRef.current.srcObject) {
+      localAudioRef.current.srcObject.getTracks().forEach((track) =>
+        track.stop()
+      );
+      localAudioRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current && remoteAudioRef.current.srcObject) {
+      remoteAudioRef.current.srcObject.getTracks().forEach((track) =>
+        track.stop()
+      );
+      remoteAudioRef.current.srcObject = null;
+    }
+    setIsVoiceConnected(false);
+  };
 
-    const handleCodeChange = (newCode) => {
-        setCode(newCode);
-        if (isCollaborating) {
-            socketRef.current.emit("codeChange", { roomId, code: newCode });
-        }
-    };
+  useEffect(() => {
+    socketRef.current = io(`${import.meta.env.VITE_API_BASE_URL}`);
+  }, []);
 
-    const reviewCode = async () => {
-        setIsLoading(true);
-        setReview("");
-        setError("");
+  useSocketListeners({
+    socketRef,
+    setCode,
+    setReview,
+    setParticipants,
+    setRoomName,
+    setError,
+    setIsLoading,
+    setIsCollaborating,
+  });
+
+  useEffect(() => {
+    const syncUser = async () => {
+      if (isSignedIn && user) {
         try {
-            if (isCollaborating) {
-                socketRef.current.emit("requestReview", { roomId });
-            } else {
-                const res = await axios.post(
-                    `${import.meta.env.VITE_API_BASE_URL}/ai/get-review`,
-                    { code }
-                );
-                setReview(res.data);
-            }
-        } catch (err) {
-            setReview(` Error: ${err.message || "Could not generate content"}`);
-        } finally {
-            setIsLoading(false);
+          const clerkId = user.id;
+          const email = user.emailAddresses?.[0]?.emailAddress || "";
+          const name = user.firstName + " " + user.lastName;
+          const image = user.profileImageUrl || "";
+
+          const payload = { clerkId, email, name, image };
+
+          await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/auth/sync-user`,
+            payload
+          );
+
+          // console.log("User synced with backend:", email);
+        } catch (error) {
+          console.error(" Failed to sync user with backend:", error.message);
         }
+      }
     };
 
-    const copyRoomId = () => {
-        navigator.clipboard.writeText(roomId);
-        setShowCopySuccess(true);
-        setTimeout(() => setShowCopySuccess(false), 2000);
-    };
+    syncUser();
+  }, [isSignedIn, user]);
 
-    const createCollaborationSession = () => {
-        if (!sessionName.trim()) return setError("Please enter a session name");
-        if (!userName.trim()) return setError("Please enter your name");
-        setError("");
-        socketRef.current.emit("createRoom", {
-            name: sessionName,
-            userName: userName.trim(),
-        });
-        socketRef.current.once("roomCreated", ({ roomId, participants }) => {
-            setRoomId(roomId);
-            setParticipants(participants);
-            setRoomName(sessionName);
-            setIsCollaborating(true);
-            setShowCopySuccess(false);
-        });
-    };
+  const handleCodeChange = (newCode) => {
+    setCode(newCode);
+    if (isCollaborating && socketRef.current) {
+      socketRef.current.emit("codeChange", { roomId, code: newCode });
+    }
+  };
 
-    const joinCollaborationSession = () => {
-        if (!roomId.trim()) return setError("Please enter a room ID");
-        if (!userName.trim()) return setError("Please enter your name");
-        setError("");
-        socketRef.current.emit("joinRoom", {
-            roomId: roomId.trim(),
-            userName: userName.trim(),
-        });
-    };
+  const reviewCode = async () => {
+    setIsLoading(true);
+    setReview("");
+    setError("");
+    try {
+      if (isCollaborating && socketRef.current) {
+        socketRef.current.emit("requestReview", { roomId });
+      } else {
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/ai/get-review`,
+          { code }
+        );
+        setReview(res.data);
+      }
+    } catch (err) {
+      setReview(` Error: ${err.message || "Could not generate content"}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    const leaveCollaborationSession = () => {
-        stopVoice();
-        setIsCollaborating(false);
-        setRoomId("");
-        setParticipants([]);
-        setRoomName("");
-        setError("You left the collaboration session");
-        setTimeout(() => setError(""), 3000);
-        setShowChat(false);
-    };
+  const copyRoomId = () => {
+    navigator.clipboard.writeText(roomId);
+    setShowCopySuccess(true);
+    setTimeout(() => setShowCopySuccess(false), 2000);
+  };
 
-    return (
-       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100 font-sans relative overflow-x-hidden">
+  const createCollaborationSession = () => {
+    if (!sessionName.trim()) return setError("Please enter a session name");
+    if (!userName.trim()) return setError("Please enter your name");
+    setError("");
+    socketRef.current.emit("createRoom", {
+      name: sessionName,
+      userName: userName.trim(),
+    });
+    socketRef.current.once("roomCreated", ({ roomId, participants }) => {
+      setRoomId(roomId);
+      setParticipants(participants);
+      setRoomName(sessionName);
+      setIsCollaborating(true);
+      setShowCopySuccess(false);
+    });
+  };
 
-            <Toaster position="top-center" reverseOrder={false} /> 
-            
-            <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-2xl border-b border-slate-700/40 p-4 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+  const joinCollaborationSession = () => {
+    if (!roomId.trim()) return setError("Please enter a room ID");
+    if (!userName.trim()) return setError("Please enter your name");
+    setError("");
+    socketRef.current.emit("joinRoom", {
+      roomId: roomId.trim(),
+      userName: userName.trim(),
+    });
+  };
 
-                <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                        <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                            <Code size={28} className="text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
-                                CodeCollab AI
-                            </h1>
-                            <p className="text-xs text-slate-400">Real-time collaborative coding</p>
-                        </div>
-                    </div>
-                    <nav className="flex items-center space-x-4">
-                        {isCollaborating && (
-                            <div className="flex items-center space-x-3 bg-slate-700/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-600/50">
-                                <div className="flex items-center space-x-2">
-                                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                    <span className="text-sm font-semibold text-green-400">LIVE</span>
-                                </div>
-                                <span className="text-sm font-medium text-slate-200">{roomName}</span>
-                                <Users size={16} className="text-slate-400" />
-                                <span className="text-sm text-slate-300">{participants.length}</span>
-                            </div>
-                        )}
-                    </nav>
+  const leaveCollaborationSession = () => {
+    stopVoice();
+    setIsCollaborating(false);
+    setRoomId("");
+    setParticipants([]);
+    setRoomName("");
+    setError("You left the collaboration session");
+    setTimeout(() => setError(""), 3000);
+    setShowChat(false);
+  };
+
+  return (
+    <>
+      <SignedOut>
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-100">
+          <div className="bg-slate-900/80 border border-slate-700 rounded-2xl px-10 py-8 shadow-2xl max-w-md text-center">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-lg">
+                <Code size={32} className="text-white" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-bold mb-2">Welcome to CodeCollab AI</h1>
+            <p className="text-slate-300 text-sm mb-6">
+              Sign in to start real-time collaborative coding with AI-powered
+              review, chat, and voice.
+            </p>
+
+            <SignInButton mode="modal">
+              <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-blue-500/30 transition-all active:scale-95">
+                Sign In to Continue
+              </button>
+            </SignInButton>
+          </div>
+        </div>
+      </SignedOut>
+
+      <SignedIn>
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-slate-100 font-sans relative overflow-x-hidden">
+          <Toaster position="top-center" reverseOrder={false} />
+
+          <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-2xl border-b border-slate-700/40 p-4 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg">
+                  <Code size={28} className="text-white" />
                 </div>
-            </header>
+                <div>
+                  <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400">
+                    CodeCollab AI
+                  </h1>
+                  <p className="text-xs text-slate-400">
+                    Real-time collaborative coding
+                  </p>
+                </div>
+              </div>
 
-            <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
-                {error && (
-                    <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl flex items-center justify-center font-medium transition-all duration-300 transform scale-100 border border-red-400">
-                        <Zap size={18} className="mr-3 text-red-200" />
-                        {error}
+              <nav className="flex items-center space-x-4">
+                {isCollaborating && (
+                  <div className="hidden md:flex items-center space-x-3 bg-slate-700/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-600/50">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-semibold text-green-400">
+                        LIVE
+                      </span>
                     </div>
+                    <span className="text-sm font-medium text-slate-200">
+                      {roomName}
+                    </span>
+                    <Users size={16} className="text-slate-400" />
+                    <span className="text-sm text-slate-300">
+                      {participants.length}
+                    </span>
+                  </div>
                 )}
 
-                <div className="w-full lg:w-1/2 flex flex-col gap-6">
-                    {!isCollaborating && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
->
-                                <div className="flex items-center space-x-3 mb-4">
-                                    <div className="p-2 bg-blue-500/20 rounded-lg">
-                                        <Plus size={20} className="text-blue-400" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-200">Create New Room</h3>
-                                </div>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
-                                        <input
-                                            type="text"
-                                            value={userName}
-                                            onChange={(e) => setUserName(e.target.value)}
-                                            placeholder="Enter your name"
-                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
-focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
-transition-all duration-300"
+                <UserButton afterSignOutUrl="/" />
+              </nav>
+            </div>
+          </header>
 
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Session Name</label>
-                                        <input
-                                            type="text"
-                                            value={sessionName}
-                                            onChange={(e) => setSessionName(e.target.value)}
-                                            placeholder="Enter session name"
-                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
-focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
-transition-all duration-300"
+          <main className="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {error && (
+              <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-red-500/90 backdrop-blur-sm text-white px-6 py-3 rounded-xl shadow-2xl flex items-center justify-center font-medium transition-all duration-300 transform scale-100 border border-red-400">
+                <Zap size={18} className="mr-3 text-red-200" />
+                {error}
+              </div>
+            )}
 
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={createCollaborationSession}
-                                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-blue-500/25 flex items-center justify-center space-x-2"
-                                    >
-                                        <Plus size={18} />
-                                        <span>Create Session</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-700/40"
->
-                                <div className="flex items-center space-x-3 mb-4">
-                                    <div className="p-2 bg-green-500/20 rounded-lg">
-                                        <LogIn size={20} className="text-green-400" />
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-200">Join Existing Room</h3>
-                                </div>
-                                <div className="space-y-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Your Name</label>
-                                        <input
-                                            type="text"
-                                            value={userName}
-                                            onChange={(e) => setUserName(e.target.value)}
-                                            placeholder="Enter your name"
-                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
-focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
-transition-all duration-300"
-
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-400 mb-1">Room ID</label>
-                                        <input
-                                            type="text"
-                                            value={roomId}
-                                            onChange={(e) => setRoomId(e.target.value)}
-                                            placeholder="Enter room ID"
-                                            className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500
-focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40
-transition-all duration-300"
-
-                                        />
-                                    </div>
-                                    <button
-                                        onClick={joinCollaborationSession}
-                                        className="w-full bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-green-500/25 flex items-center justify-center space-x-2"
-                                    >
-                                        <LogIn size={18} />
-                                        <span>Join Session</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {isCollaborating && (
-                        <ParticipantsList
-                            roomName={roomName}
-                            roomId={roomId}
-                            socketRef={socketRef}
-                            participants={participants}
-                            showCopySuccess={showCopySuccess}
-                            copyRoomId={copyRoomId}
-                            leaveSession={leaveCollaborationSession}
-                            className="bg-slate-800/80 rounded-2xl p-6 shadow-xl border border-slate-700/50"
+            <div className="w-full lg:w-1/2 flex flex-col gap-6">
+              {!isCollaborating && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Create Room */}
+                  <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="p-2 bg-blue-500/20 rounded-lg">
+                        <Plus size={20} className="text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-200">
+                        Create New Room
+                      </h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">
+                          Your Name
+                        </label>
+                        <input
+                          type="text"
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value)}
+                          placeholder="Enter your name"
+                          className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40 transition-all duration-300"
                         />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">
+                          Session Name
+                        </label>
+                        <input
+                          type="text"
+                          value={sessionName}
+                          onChange={(e) => setSessionName(e.target.value)}
+                          placeholder="Enter session name"
+                          className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40 transition-all duration-300"
+                        />
+                      </div>
+                      <button
+                        onClick={createCollaborationSession}
+                        className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-blue-500/25 flex items-center justify-center space-x-2"
+                      >
+                        <Plus size={18} />
+                        <span>Create Session</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-700/40 p-6">
+                    <div className="flex items-center space-x-3 mb-4">
+                      <div className="p-2 bg-green-500/20 rounded-lg">
+                        <LogIn size={20} className="text-green-400" />
+                      </div>
+                      <h3 className="text-lg font-bold text-slate-200">
+                        Join Existing Room
+                      </h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">
+                          Your Name
+                        </label>
+                        <input
+                          type="text"
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value)}
+                          placeholder="Enter your name"
+                          className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40 transition-all duration-300"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-400 mb-1">
+                          Room ID
+                        </label>
+                        <input
+                          type="text"
+                          value={roomId}
+                          onChange={(e) => setRoomId(e.target.value)}
+                          placeholder="Enter room ID"
+                          className="w-full bg-slate-800/60 border border-slate-700/40 backdrop-blur-xl rounded-xl px-4 py-3 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-400/40 transition-all duration-300"
+                        />
+                      </div>
+                      <button
+                        onClick={joinCollaborationSession}
+                        className="w-full bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-green-500/25 flex items-center justify-center space-x-2"
+                      >
+                        <LogIn size={18} />
+                        <span>Join Session</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isCollaborating && (
+                <ParticipantsList
+                  roomName={roomName}
+                  roomId={roomId}
+                  socketRef={socketRef}
+                  participants={participants}
+                  showCopySuccess={showCopySuccess}
+                  copyRoomId={copyRoomId}
+                  leaveSession={leaveCollaborationSession}
+                  className="bg-slate-800/80 rounded-2xl p-6 shadow-xl border border-slate-700/50"
+                />
+              )}
+
+              <div className="flex-1 flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-slate-200 flex items-center space-x-2">
+                    <Code size={24} className="text-blue-400" />
+                    <span>Code Editor</span>
+                  </h2>
+                  {isCollaborating && (
+                    <div className="flex items-center space-x-2 text-sm text-slate-400">
+                      <Wifi size={16} className="text-green-400" />
+                      <span>Real-time sync active</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-700/40 shadow-[0_0_20px_rgba(0,0,0,0.5)] overflow-hidden min-h-[500px]">
+                  <CodeEditor code={code} onChange={handleCodeChange} />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-4 sticky bottom-0 z-40 bg-slate-900/80 backdrop-blur-sm p-4 -mx-4 lg:mx-0 rounded-t-2xl border-t border-slate-700/50 lg:border-none">
+                {isCollaborating && (
+                  <div className="bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
+                    <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+                      <button
+                        onClick={() => {
+                          startCall();
+                          setIsVoiceConnected(true);
+                        }}
+                        disabled={isVoiceConnected}
+                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-teal-600 hover:bg-teal-500 disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md hover:shadow-teal-500/40 active:scale-95"
+                      >
+                        <PhoneCall size={18} className="mr-2" />
+                        Start Voice
+                      </button>
+
+                      <button
+                        onClick={toggleMute}
+                        disabled={!isVoiceConnected}
+                        className={`flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                          muted
+                            ? "bg-red-600 hover:bg-red-500 shadow-red-500/40"
+                            : "bg-purple-600 hover:bg-purple-500 shadow-purple-500/40"
+                        } disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md active:scale-95`}
+                      >
+                        {muted ? (
+                          <MicOff size={18} className="mr-2" />
+                        ) : (
+                          <Mic size={18} className="mr-2" />
+                        )}
+                        {muted ? "Unmute" : "Mute"}
+                      </button>
+
+                      <button
+                        onClick={stopVoice}
+                        disabled={!isVoiceConnected}
+                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-300 shadow-md active:scale-95"
+                      >
+                        <PhoneMissed size={18} className="mr-2" />
+                        Stop Voice
+                      </button>
+                    </div>
+
+                    {isVoiceConnected && (
+                      <div className="flex items-center text-teal-400 font-semibold text-sm">
+                        <Wifi
+                          size={18}
+                          className="mr-2 animate-pulse text-teal-300"
+                        />
+                        Voice Connected
+                      </div>
                     )}
 
-                    <div className="flex-1 flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-200 flex items-center space-x-2">
-                                <Code size={24} className="text-blue-400" />
-                                <span>Code Editor</span>
-                            </h2>
-                            {isCollaborating && (
-                                <div className="flex items-center space-x-2 text-sm text-slate-400">
-                                    <Wifi size={16} className="text-green-400" />
-                                    <span>Real-time sync active</span>
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="flex-1 bg-slate-900/70 backdrop-blur-xl rounded-2xl border border-slate-700/40 shadow-[0_0_20px_rgba(0,0,0,0.5)] overflow-hidden min-h-[500px]"
->
-                            <CodeEditor code={code} onChange={handleCodeChange} />
-                        </div>
-                    </div>
+                    <audio ref={localAudioRef} autoPlay muted className="hidden" />
+                    <audio ref={remoteAudioRef} autoPlay className="hidden" />
+                  </div>
+                )}
 
-                    <div className="flex flex-col gap-4 sticky bottom-0 z-40 bg-slate-900/80 backdrop-blur-sm p-4 -mx-4 lg:mx-0 rounded-t-2xl border-t border-slate-700/50 lg:border-none">
-                        {isCollaborating && (
-                            <div className="bg-slate-800 rounded-xl p-4 shadow-xl border border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-3">
-                                <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                                    <button
-                                        onClick={() => { startCall(); setIsVoiceConnected(true); }}
-                                        disabled={isVoiceConnected}
-                                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-teal-600 hover:bg-teal-500 disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md hover:shadow-teal-500/40 active:scale-95"
-                                    >
-                                        <PhoneCall size={18} className="mr-2" />
-                                        Start Voice
-                                    </button>
-
-                                    <button
-                                        onClick={toggleMute}
-                                        disabled={!isVoiceConnected}
-                                        className={`flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                                            muted 
-                                                ? "bg-red-600 hover:bg-red-500 shadow-red-500/40" 
-                                                : "bg-purple-600 hover:bg-purple-500 shadow-purple-500/40"
-                                        } disabled:bg-slate-700 disabled:text-slate-400 text-white shadow-md active:scale-95`}
-                                    >
-                                        {muted ? <MicOff size={18} className="mr-2" /> : <Mic size={18} className="mr-2" />}
-                                        {muted ? "Unmute" : "Mute"}
-                                    </button>
-                                    
-                                    <button
-                                        onClick={stopVoice}
-                                        disabled={!isVoiceConnected}
-                                        className="flex items-center justify-center flex-1 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 bg-slate-700 hover:bg-slate-600 disabled:opacity-50 text-slate-300 shadow-md active:scale-95"
-                                    >
-                                        <PhoneMissed size={18} className="mr-2" />
-                                        Stop Voice
-                                    </button>
-                                </div>
-
-                                {isVoiceConnected && (
-                                    <div className="flex items-center text-teal-400 font-semibold text-sm">
-                                        <Wifi size={18} className="mr-2 animate-pulse text-teal-300" />
-                                        Voice Connected
-                                    </div>
-                                )}
-
-                                <audio ref={localAudioRef} autoPlay muted className="hidden" />
-                                <audio ref={remoteAudioRef} autoPlay className="hidden" />
-                            </div>
-                        )}
-
-                        <button
-                            onClick={reviewCode}
-                            disabled={isLoading}
-                            className="w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 
-hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] 
-disabled:opacity-40 transition-all duration-300 
-text-white px-6 py-4 rounded-2xl font-bold text-lg 
-active:scale-95 flex items-center justify-center space-x-3"
-
-                        >
-                            {isLoading ? (
-                                <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                            ) : (
-                                <>
-                                    <Zap size={24} className="text-yellow-300 group-hover:scale-110 transition-transform" />
-                                    <span>
-                                        {isCollaborating ? "Request Collaborative AI Review" : "Generate AI Review"}
-                                    </span>
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </div>
-
-                <div className="w-full lg:w-1/2 lg:sticky lg:top-24 h-fit lg:h-[calc(100vh-8rem)] flex flex-col"> 
-                    <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-2xl border border-slate-700/50 h-full flex flex-col">
-                        {/* Review Panel Header */}
-                        <div className="p-6 border-b border-slate-700/50 flex-shrink-0">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center space-x-3">
-                                    <div className="p-2 bg-purple-500/20 rounded-lg">
-                                        <CornerDownLeft size={24} className="text-purple-400" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-xl font-bold text-slate-200">AI Code Review</h2>
-                                        <p className="text-sm text-slate-400">Detailed feedback and suggestions</p>
-                                    </div>
-                                </div>
-                                {review && (
-                                    <button
-                                        onClick={() => downloadReview(review)}
-                                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors duration-200 text-slate-300 hover:text-white"
-                                        title="Download Review"
-                                    >
-                                        <Download size={18} />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                        
-                        <div className="flex-1 overflow-y-auto p-6">
-                            <ReviewPanel
-                                isLoading={isLoading}
-                                review={review}
-                                isCollaborating={isCollaborating}
-                                downloadReview={() => downloadReview(review)}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            {isCollaborating && (
                 <button
-                    onClick={() => setShowChat(true)}
-                    className={`fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-teal-500 to-green-600 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 transform active:scale-95 text-white shadow-teal-500/50 hover:shadow-teal-500/70 ${
-                        showChat ? 'opacity-0 pointer-events-none' : '' 
-                    }`}
-                    aria-label="Open Chat"
+                  onClick={reviewCode}
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 hover:shadow-[0_0_25px_rgba(99,102,241,0.6)] disabled:opacity-40 transition-all duration-300 text-white px-6 py-4 rounded-2xl font-bold text-lg active:scale-95 flex items-center justify-center space-x-3"
                 >
-                    <MessageSquare size={24} />
+                  {isLoading ? (
+                    <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <Zap
+                        size={24}
+                        className="text-yellow-300 group-hover:scale-110 transition-transform"
+                      />
+                      <span>
+                        {isCollaborating
+                          ? "Request Collaborative AI Review"
+                          : "Generate AI Review"}
+                      </span>
+                    </>
+                  )}
                 </button>
-            )}
+              </div>
+            </div>
 
-            {isCollaborating && (
-                <div
-                    className={`fixed top-0 right-0 h-full w-full max-w-md 
-bg-slate-900/80 backdrop-blur-2xl 
-border-l border-teal-400/30 shadow-[0_0_30px_rgba(0,0,0,0.5)] 
-z-[55] transition-transform duration-500 ease-in-out
- ${
-                        showChat ? 'translate-x-0' : 'translate-x-full'
-                    }`}
-                >
-                    <div className="flex flex-col h-full">
-                        {/* Chat Header */}
-                        <div className="flex justify-between items-center p-6 border-b border-slate-700 flex-shrink-0 bg-slate-800/80 backdrop-blur-sm">
-                            <div className="flex items-center space-x-3">
-                                <div className="p-2 bg-teal-500/20 rounded-lg">
-                                    <MessageSquare size={20} className="text-teal-400" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-200">Collaborative Chat</h3>
-                                    <p className="text-xs text-slate-400">Real-time messaging</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setShowChat(false)}
-                                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
-                                aria-label="Close Chat"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-                        
-                        <div className="flex-grow bg-slate-900/50"> 
-                            <Chat socketRef={socketRef} userName={userName} />
-                        </div>
+            <div className="w-full lg:w-1/2 lg:sticky lg:top-24 h-fit lg:h-[calc(100vh-8rem)] flex flex-col">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-2xl border border-slate-700/50 h-full flex flex-col">
+                <div className="p-6 border-b border-slate-700/50 flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-purple-500/20 rounded-lg">
+                        <CornerDownLeft size={24} className="text-purple-400" />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-bold text-slate-200">
+                          AI Code Review
+                        </h2>
+                        <p className="text-sm text-slate-400">
+                          Detailed feedback and suggestions
+                        </p>
+                      </div>
                     </div>
+                    {review && (
+                      <button
+                        onClick={() => downloadReview(review)}
+                        className="p-2 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors duration-200 text-slate-300 hover:text-white"
+                        title="Download Review"
+                      >
+                        <Download size={18} />
+                      </button>
+                    )}
+                  </div>
                 </div>
-            )}
+
+                <div className="flex-1 overflow-y-auto p-6">
+                  <ReviewPanel
+                    isLoading={isLoading}
+                    review={review}
+                    isCollaborating={isCollaborating}
+                    downloadReview={() => downloadReview(review)}
+                  />
+                </div>
+              </div>
+            </div>
+          </main>
+
+          {isCollaborating && (
+            <button
+              onClick={() => setShowChat(true)}
+              className={`fixed bottom-6 right-6 z-50 p-4 bg-gradient-to-r from-teal-500 to-green-600 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 transform active:scale-95 text-white shadow-teal-500/50 hover:shadow-teal-500/70 ${
+                showChat ? "opacity-0 pointer-events-none" : ""
+              }`}
+              aria-label="Open Chat"
+            >
+              <MessageSquare size={24} />
+            </button>
+          )}
+
+          {isCollaborating && (
+            <div
+              className={`fixed top-0 right-0 h-full w-full max-w-md bg-slate-900/80 backdrop-blur-2xl border-l border-teal-400/30 shadow-[0_0_30px_rgba(0,0,0,0.5)] z-[55] transition-transform duration-500 ease-in-out ${
+                showChat ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              <div className="flex flex-col h-full">
+                <div className="flex justify-between items-center p-6 border-b border-slate-700 flex-shrink-0 bg-slate-800/80 backdrop-blur-sm">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-teal-500/20 rounded-lg">
+                      <MessageSquare size={20} className="text-teal-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-200">
+                        Collaborative Chat
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Real-time messaging
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowChat(false)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-colors duration-200"
+                    aria-label="Close Chat"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="flex-grow bg-slate-900/50">
+                  <Chat socketRef={socketRef} userName={userName} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-    );
+      </SignedIn>
+    </>
+  );
 }
 
 export default App;
