@@ -19,6 +19,7 @@ app.use(
 );
 
 app.use(express.json());
+app.use("/ai", require("./routes/ai.routes"));
 
 app.post("/clerk/webhook", async (req, res) => {
   const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);

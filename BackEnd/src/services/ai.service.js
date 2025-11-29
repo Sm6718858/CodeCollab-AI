@@ -76,8 +76,8 @@ ${text}
     return result.response.text();
 
   } catch (err) {
-    console.error("❌ AI Error:", err.message);
-    return "⚠️ Unable to generate review. Try again.";
+    console.error("AI Error:", err.message);
+    return " Unable to generate review. Try again.";
   }
 };
 
