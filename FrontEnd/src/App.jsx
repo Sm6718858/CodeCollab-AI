@@ -281,7 +281,6 @@ function App() {
             <div className="w-full lg:w-1/2 flex flex-col gap-6">
               {!isCollaborating && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Create Room */}
                   <div className="bg-slate-900/70 backdrop-blur-xl rounded-2xl p-6 border border-slate-700/40 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="p-2 bg-blue-500/20 rounded-lg">
